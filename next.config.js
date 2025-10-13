@@ -1,35 +1,68 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Conditionally enable static export only for production builds
-  ...(process.env.NODE_ENV === 'production' && process.env.STATIC_EXPORT === 'true' ? {
-    output: 'export',
-    distDir: 'out',
-  } : {}),
-  trailingSlash: true, // Add trailing slashes to all routes
+
+  // Vercel deployment configuration (no static export for server-side features)
+  // Remove static export for Vercel as we need API routes and server-side features
+
   images: {
-    unoptimized: true,
-    domains: [
-      'upload.wikimedia.org',
-      'lh3.googleusercontent.com',
-      'images.ctfassets.net',
-      'cdn.icon-icons.com',
-      'mistral.ai',
-      'huggingface.co',
-      'cdn.worldvectorlogo.com'
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.ctfassets.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.icon-icons.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'mistral.ai',
+      },
+      {
+        protocol: 'https',
+        hostname: 'huggingface.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.worldvectorlogo.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'graph.microsoft.com',
+      }
     ]
   },
+
   // Add transpilePackages to help with compatibility
   transpilePackages: ['react-icons', 'framer-motion'],
-  // Disable barrel optimization for react-icons
+
+  // Experimental features for better performance
   experimental: {
-    optimizePackageImports: []
+    optimizePackageImports: ['react-icons'],
+    serverComponentsExternalPackages: ['argon2']
   },
-  // Update basePath and assetPrefix configuration for GitHub Pages
-  basePath: process.env.NODE_ENV === 'production' ? '/Encode-25' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/Encode-25' : '',
-  // Configure webpack to handle static assets
-  webpack: (config) => {
+
+  // Configure webpack for better builds
+  webpack: (config, { isServer }) => {
+    // Handle argon2 for server-side only
+    if (isServer) {
+      config.externals.push('argon2');
+    }
+
+    // Handle file loading
     config.module.rules.push({
       test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
       use: {
@@ -37,11 +70,16 @@ const nextConfig = {
         options: {
           limit: 100000,
           name: '[name].[ext]',
-          publicPath: `${process.env.NODE_ENV === 'production' ? '/Encode-25' : ''}/`,
         },
       },
     });
+
     return config;
+  },
+
+  // Environment variables for build time
+  env: {
+    CUSTOM_KEY: 'anoki-app',
   }
 }
 
