@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FiUpload, FiImage, FiVideo, FiX, FiCrop, FiRotateCw, FiZoomIn, FiZoomOut, FiSave } from 'react-icons/fi'
 import { useDropzone } from 'react-dropzone'
+import DownloadProtection from '@/components/DownloadProtection'
 
 type EditorType = 'image' | 'video'
 type ImageEditMode = 'crop' | 'resize' | 'rotate' | 'none'
@@ -60,13 +61,89 @@ export default function EditorsPage() {
     setImageEditMode(mode)
   }
 
-  const handleSaveImage = () => {
-    if (!canvasRef.current || !preview) return
-    
-    // In a real implementation, this would apply the edits to the image
-    // For this demo, we'll just simulate a successful edit
-    setEdited(true)
-    setImageEditMode('none')
+  const handleSaveImage = async () => {
+    if (!canvasRef.current || !preview || !imageRef.current) return
+
+    try {
+      const canvas = canvasRef.current
+      const image = imageRef.current
+      const ctx = canvas.getContext('2d')
+
+      if (!ctx) return
+
+      // Set canvas dimensions to match image
+      canvas.width = image.naturalWidth
+      canvas.height = image.naturalHeight
+
+      // Apply the current edit mode
+      switch (imageEditMode) {
+        case 'rotate':
+          // Rotate 90 degrees clockwise
+          ctx.translate(canvas.width / 2, canvas.height / 2)
+          ctx.rotate(Math.PI / 2)
+          ctx.drawImage(image, -image.naturalHeight / 2, -image.naturalWidth / 2, image.naturalHeight, image.naturalWidth)
+          break
+
+        case 'crop':
+          // Simple center crop (in real implementation, this would use user selection)
+          const cropSize = Math.min(image.naturalWidth, image.naturalHeight)
+          const cropX = (image.naturalWidth - cropSize) / 2
+          const cropY = (image.naturalHeight - cropSize) / 2
+          canvas.width = cropSize
+          canvas.height = cropSize
+          ctx.drawImage(image, cropX, cropY, cropSize, cropSize, 0, 0, cropSize, cropSize)
+          break
+
+        case 'resize':
+          // Get resize values from inputs
+          const widthInput = document.querySelector('input[placeholder="Width"]') as HTMLInputElement
+          const heightInput = document.querySelector('input[placeholder="Height"]') as HTMLInputElement
+          const newWidth = parseInt(widthInput?.value) || image.naturalWidth
+          const newHeight = parseInt(heightInput?.value) || image.naturalHeight
+          canvas.width = newWidth
+          canvas.height = newHeight
+          ctx.drawImage(image, 0, 0, newWidth, newHeight)
+          break
+
+        default:
+          ctx.drawImage(image, 0, 0)
+      }
+
+      // Convert canvas to blob and create new preview
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const newPreviewUrl = URL.createObjectURL(blob)
+          if (preview) {
+            URL.revokeObjectURL(preview)
+          }
+          setPreview(newPreviewUrl)
+          setEdited(true)
+          setImageEditMode('none')
+        }
+      }, 'image/png')
+
+    } catch (error) {
+      console.error('Error saving image:', error)
+      alert('Failed to save image edits')
+    }
+  }
+
+  const handleDownloadImage = () => {
+    if (!canvasRef.current) return
+
+    try {
+      // Create download link from canvas
+      const canvas = canvasRef.current
+      const link = document.createElement('a')
+      link.download = `edited_${file?.name || 'image'}.png`
+      link.href = canvas.toDataURL('image/png')
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error) {
+      console.error('Download error:', error)
+      alert('Failed to download edited image')
+    }
   }
 
   // Clean up object URLs when component unmounts
@@ -277,24 +354,29 @@ export default function EditorsPage() {
                   </div>
                 )}
 
-                {/* Save Button */}
-                <div className="text-center">
-                  <button 
-                    onClick={handleSaveImage}
-                    className={`px-6 py-3 rounded-lg font-medium ${
-                      imageEditMode !== 'none'
-                        ? 'bg-green-600 hover:bg-green-700 text-white'
-                        : edited 
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                          : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    }`}
-                    disabled={imageEditMode === 'none' && !edited}
-                  >
-                    <div className="flex items-center">
-                      <FiSave className="mr-2" />
-                      {imageEditMode !== 'none' ? 'Apply Changes' : 'Download Edited Image'}
+                {/* Action Buttons */}
+                <div className="text-center space-y-3">
+                  {imageEditMode !== 'none' && (
+                    <button
+                      onClick={handleSaveImage}
+                      className="px-6 py-3 rounded-lg font-medium bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+                    >
+                      <div className="flex items-center justify-center">
+                        <FiSave className="mr-2" />
+                        Apply Changes
+                      </div>
+                    </button>
+                  )}
+
+                  {edited && (
+                    <div className="w-full sm:w-auto">
+                      <DownloadProtection
+                        onDownload={handleDownloadImage}
+                        downloadText="Download Edited Image"
+                        className="w-full sm:w-auto"
+                      />
                     </div>
-                  </button>
+                  )}
                 </div>
               </>
             )}

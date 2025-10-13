@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { FiUpload, FiImage, FiVideo, FiX, FiZap, FiDownload, FiExternalLink } from 'react-icons/fi'
 import { useDropzone } from 'react-dropzone'
+import DownloadProtection from '@/components/DownloadProtection'
 
 type EnhancerType = 'image' | 'video'
 type EnhancementLevel = 'low' | 'medium' | 'high'
@@ -59,20 +60,74 @@ export default function EnhancersPage() {
     setEnhancementLevel(level)
   }
 
-  const handleEnhance = () => {
+  const handleEnhance = async () => {
     if (!file) return
-    
+
     setIsEnhancing(true)
-    
-    // Simulate enhancement process
-    setTimeout(() => {
+
+    try {
+      // Create FormData for file upload
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('enhancerType', enhancerType)
+      formData.append('enhancementLevel', enhancementLevel)
+
+      // Call enhancement API
+      const response = await fetch('/api/enhance', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Enhancement failed')
+      }
+
+      const result = await response.json()
+
+      if (result.success) {
+        setEnhancementComplete(true)
+        // Store the enhanced file URL for later use
+        sessionStorage.setItem('enhancedFileUrl', result.downloadUrl)
+        sessionStorage.setItem('enhancedFileName', result.fileName)
+      } else {
+        throw new Error(result.error || 'Enhancement failed')
+      }
+    } catch (error) {
+      console.error('Enhancement error:', error)
+      alert('Enhancement failed. Please try again.')
+    } finally {
       setIsEnhancing(false)
-      setEnhancementComplete(true)
-    }, 3000)
+    }
   }
 
   const resetEnhancer = () => {
     setEnhancementComplete(false)
+  }
+
+  const handleDownload = async () => {
+    try {
+      const downloadUrl = sessionStorage.getItem('enhancedFileUrl')
+      const fileName = sessionStorage.getItem('enhancedFileName')
+
+      if (!downloadUrl || !fileName) {
+        throw new Error('Download information not found')
+      }
+
+      // Create download link
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Clean up session storage
+      sessionStorage.removeItem('enhancedFileUrl')
+      sessionStorage.removeItem('enhancedFileName')
+    } catch (error) {
+      console.error('Download error:', error)
+      alert('Download failed. Please try enhancing again.')
+    }
   }
 
   return (
@@ -277,14 +332,11 @@ export default function EnhancersPage() {
                 </button>
               ) : (
                 <div className="space-y-3">
-                  <button 
-                    className="px-6 py-3 rounded-lg font-medium bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
-                  >
-                    <div className="flex items-center justify-center">
-                      <FiDownload className="mr-2" />
-                      Download Enhanced {enhancerType}
-                    </div>
-                  </button>
+                  <DownloadProtection
+                    onDownload={handleDownload}
+                    downloadText={`Download Enhanced ${enhancerType}`}
+                    className="w-full sm:w-auto"
+                  />
                   <div>
                     <button 
                       onClick={resetEnhancer}

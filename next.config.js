@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export', // Enable static exports for GitHub Pages
-  distDir: 'out', // Output directory for the static build
+  // Conditionally enable static export only for production builds
+  ...(process.env.NODE_ENV === 'production' && process.env.STATIC_EXPORT === 'true' ? {
+    output: 'export',
+    distDir: 'out',
+  } : {}),
   trailingSlash: true, // Add trailing slashes to all routes
   images: {
     unoptimized: true,

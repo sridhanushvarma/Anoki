@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String
+  password          String?   // Nullable for OAuth users
+  emailVerified     DateTime?
+  image             String?
+  provider          Provider  @default(EMAIL)
+  providerId        String?   // OAuth provider ID
+  isActive          Boolean   @default(true)
+  lastLoginAt       DateTime?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  lockedUntil       DateTime?
+  twoFactorSecret   String?
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorBackupCodes String? // JSON string of backup codes array
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  sessions          Session[]
+  loginAttempts     LoginAttempt[]
+  auditLogs         AuditLog[]
+  userProfile       UserProfile?
+  verificationTokens VerificationToken[]
+
+  @@map("users")
+}
+
+// User profile for additional information
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  firstName   String?
+  lastName    String?
+  bio         String?
+  website     String?
+  location    String?
+  timezone    String?
+  preferences Json?    // Store user preferences as JSON
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// Session management
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  sessionToken String   @unique
+  accessToken  String?
+  refreshToken String?
+  expires      DateTime
+  ipAddress    String?
+  userAgent    String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Login attempt tracking for security
+model LoginAttempt {
+  id          String    @id @default(cuid())
+  userId      String?   // Nullable for failed attempts with unknown users
+  email       String
+  ipAddress   String
+  userAgent   String?
+  success     Boolean
+  failureReason String?
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("login_attempts")
+}
+
+// Audit log for security tracking
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?  // Nullable for system events
+  action      String   // LOGIN, LOGOUT, PASSWORD_CHANGE, etc.
+  resource    String?  // What was accessed/modified
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?    // Additional context
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
+
+// Email verification tokens
+model VerificationToken {
+  id         String   @id @default(cuid())
+  identifier String   // Email address
+  token      String   @unique
+  expires    DateTime
+  type       TokenType @default(EMAIL_VERIFICATION)
+  userId     String?  // Optional user ID for easier querying
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Rate limiting for security
+model RateLimit {
+  id          String   @id @default(cuid())
+  identifier  String   // IP address or user ID
+  action      String   // LOGIN, REGISTER, etc.
+  count       Int      @default(1)
+  windowStart DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([identifier, action, windowStart])
+  @@map("rate_limits")
+}
+
+// Enums
+enum Provider {
+  EMAIL
+  GOOGLE
+  GITHUB
+  MICROSOFT
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  TWO_FACTOR
+}

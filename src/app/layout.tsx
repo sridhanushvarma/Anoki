@@ -4,6 +4,7 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { AuthProvider } from '@/contexts/AuthContext'
 import CommandButton from '@/components/CommandButton'
 import { BASE_PATH } from './constants'
 
@@ -27,12 +28,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Navbar />
-          <main className="flex-grow container mx-auto px-4 py-8">
-            {children}
-          </main>
-          <Footer />
-          <CommandButton />
+          <AuthProvider>
+            <Navbar />
+            <main className="flex-grow container mx-auto px-4 py-8">
+              {children}
+            </main>
+            <Footer />
+            <CommandButton />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

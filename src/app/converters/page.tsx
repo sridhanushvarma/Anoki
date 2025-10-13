@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiUpload, FiFile, FiX } from 'react-icons/fi'
 import { useDropzone } from 'react-dropzone'
+import DownloadProtection from '@/components/DownloadProtection'
 
 type ConversionType = 'pdf-to-docx' | 'docx-to-pdf' | 'jpg-to-png' | 'png-to-jpg' | 'mp4-to-mp3' | 'more'
 
@@ -41,21 +42,87 @@ export default function ConvertersPage() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const handleConvert = () => {
+  const handleConvert = async () => {
     if (!file) return
-    
+
     setIsConverting(true)
-    
-    // Simulate conversion process
-    setTimeout(() => {
+
+    try {
+      // Create FormData for file upload
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('conversionType', selectedConversion)
+
+      // Add conversion options based on type
+      if (selectedConversion === 'pdf-to-docx') {
+        const maintainFormatting = document.querySelector('input[name="maintainFormatting"]') as HTMLInputElement
+        const extractImages = document.querySelector('input[name="extractImages"]') as HTMLInputElement
+        const pageFrom = document.querySelector('input[name="pageFrom"]') as HTMLInputElement
+        const pageTo = document.querySelector('input[name="pageTo"]') as HTMLInputElement
+
+        formData.append('maintainFormatting', maintainFormatting?.checked ? 'true' : 'false')
+        formData.append('extractImages', extractImages?.checked ? 'true' : 'false')
+        if (pageFrom?.value) formData.append('pageFrom', pageFrom.value)
+        if (pageTo?.value) formData.append('pageTo', pageTo.value)
+      }
+
+      // Call conversion API
+      const response = await fetch('/api/convert', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Conversion failed')
+      }
+
+      const result = await response.json()
+
+      if (result.success) {
+        setConversionComplete(true)
+        // Store the download URL for later use
+        sessionStorage.setItem('convertedFileUrl', result.downloadUrl)
+        sessionStorage.setItem('convertedFileName', result.fileName)
+      } else {
+        throw new Error(result.error || 'Conversion failed')
+      }
+    } catch (error) {
+      console.error('Conversion error:', error)
+      alert('Conversion failed. Please try again.')
+    } finally {
       setIsConverting(false)
-      setConversionComplete(true)
-    }, 2000)
+    }
   }
 
   const resetConverter = () => {
     setFile(null)
     setConversionComplete(false)
+  }
+
+  const handleDownload = async () => {
+    try {
+      const downloadUrl = sessionStorage.getItem('convertedFileUrl')
+      const fileName = sessionStorage.getItem('convertedFileName')
+
+      if (!downloadUrl || !fileName) {
+        throw new Error('Download information not found')
+      }
+
+      // Create download link
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Clean up session storage
+      sessionStorage.removeItem('convertedFileUrl')
+      sessionStorage.removeItem('convertedFileName')
+    } catch (error) {
+      console.error('Download error:', error)
+      alert('Download failed. Please try converting again.')
+    }
   }
 
   return (
@@ -209,28 +276,40 @@ export default function ConvertersPage() {
                     <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                       <div className="mb-4">
                         <label className="flex items-center">
-                          <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600" defaultChecked />
+                          <input
+                            type="checkbox"
+                            name="maintainFormatting"
+                            className="form-checkbox h-5 w-5 text-blue-600"
+                            defaultChecked
+                          />
                           <span className="ml-2">Maintain original formatting</span>
                         </label>
                       </div>
                       <div className="mb-4">
                         <label className="flex items-center">
-                          <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600" defaultChecked />
+                          <input
+                            type="checkbox"
+                            name="extractImages"
+                            className="form-checkbox h-5 w-5 text-blue-600"
+                            defaultChecked
+                          />
                           <span className="ml-2">Extract images</span>
                         </label>
                       </div>
                       <div>
                         <label className="block mb-2">Page range (leave empty for all pages)</label>
                         <div className="flex space-x-2">
-                          <input 
-                            type="text" 
-                            placeholder="From" 
+                          <input
+                            type="text"
+                            name="pageFrom"
+                            placeholder="From"
                             className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md w-24"
                           />
                           <span className="self-center">-</span>
-                          <input 
-                            type="text" 
-                            placeholder="To" 
+                          <input
+                            type="text"
+                            name="pageTo"
+                            placeholder="To"
                             className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md w-24"
                           />
                         </div>
@@ -260,12 +339,13 @@ export default function ConvertersPage() {
               </svg>
               <h2 className="text-2xl font-bold mb-2">Conversion Complete!</h2>
               <p className="text-gray-600 dark:text-gray-400 mb-6">Your file has been successfully converted.</p>
-              <a 
-                href="#" 
-                className="inline-block bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg transition-colors mb-4"
-              >
-                Download Converted File
-              </a>
+              <div className="mb-4">
+                <DownloadProtection
+                  onDownload={handleDownload}
+                  downloadText="Download Converted File"
+                  className="w-full sm:w-auto"
+                />
+              </div>
               <div>
                 <button 
                   onClick={resetConverter}
