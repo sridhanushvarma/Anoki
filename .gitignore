@@ -8,66 +8,29 @@
 /coverage
 /test
 /tests
-/test-results
-/test-results.xml
-/test-results.json
-/test-results.html
-/test-results.xml.gz
-/test-results.json.gz
-/test-results.html.gz
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64
-/test-results.xml.gz.base64
-/test-results.json.gz.base64
-/test-results.html.gz.base64 
-/test-2fa.js
-/test-2fa.js.gz
-/test-2fa.js.gz.base64
-/test-2fa.js.gz.base64
-/test-auth.js
-/test-auth.js.gz
-/test-auth.js.gz.base64
-/test-auth.js.gz.base64
+__tests__/
+*.test.js
+*.test.ts
+*.test.tsx
+*.spec.js
+*.spec.ts
+*.spec.tsx
+test-*.js
+test-*.ts
+*-test.js
+*-test.ts
+/test-results*
+/test-2fa*
+/test-auth*
+*.test.json
+*.test.xml
+*.test.html
+/jest-results*
+/cypress/
+/e2e/
+/.nyc_output
+/playwright-report/
+/test-results/
 
 # next.js
 /.next/
@@ -97,11 +60,76 @@ next-env.d.ts
 
 /src/generated/prisma
 
-#Documentation
-/API_DOCUMENTATION.md
-/AUTHENTICATION_SYSTEM.md
-/DEPLOYMENT_GUIDE.md
-/SECURITY_AUDIT.md
-/USER_GUIDE.md
-/PROJECT_SUMMARY.md
-/FEATURE_DEPLOYMENT_GUIDE.md
+# Documentation (hide detailed docs, keep essential ones)
+API_DOCUMENTATION.md
+AUTHENTICATION_SYSTEM.md
+DEPLOYMENT_GUIDE.md
+SECURITY_AUDIT.md
+USER_GUIDE.md
+PROJECT_SUMMARY.md
+FEATURE_DEPLOYMENT_GUIDE.md
+FEATURE_VERIFICATION_REPORT.md
+FINAL_COMPLETION_REPORT.md
+FEATURE_UPGRADE_COMPLETION_REPORT.md
+OAUTH_FIX_GUIDE.md
+OAUTH_SETUP.md
+README_AUTH.md
+AUTHENTICATION.md
+project-report.md
+project-report.pdf
+
+# Keep these essential markdown files:
+# README.md (main project readme)
+# CHANGELOG.md (if exists)
+# CONTRIBUTING.md (if exists)
+# LICENSE.md (if exists)
+
+# Temporary files and uploads
+/uploads/
+*.tmp
+*.temp
+/temp/
+/tmp/
+
+# Development and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+/prisma/dev.db
+/prisma/test.db
+
+# Log files
+*.log
+logs/
+/logs/
+
+# Environment and config files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.example
+.env.template
+
+# Python virtual environment (if any)
+/venv/
+/env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Backup files
+*.bak
+*.backup
+*.orig
