@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, unlink } from 'fs/promises'
 import { join } from 'path'
 import { v4 as uuidv4 } from 'uuid'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+
+const execAsync = promisify(exec)
 
 // Maximum file size (50MB)
 const MAX_FILE_SIZE = 50 * 1024 * 1024
@@ -11,8 +15,7 @@ const SUPPORTED_CONVERSIONS = [
   'pdf-to-docx',
   'docx-to-pdf',
   'jpg-to-png',
-  'png-to-jpg',
-  'mp4-to-mp3'
+  'png-to-jpg'
 ]
 
 export async function POST(request: NextRequest) {
@@ -98,12 +101,6 @@ export async function POST(request: NextRequest) {
           success = await convertImageFormat(inputFilePath, outputFilePath, 'jpg')
           break
           
-        case 'mp4-to-mp3':
-          outputFileName = `${fileId}_output.mp3`
-          outputFilePath = join(uploadsDir, outputFileName)
-          success = await convertVideoToAudio(inputFilePath, outputFilePath)
-          break
-          
         default:
           throw new Error('Unsupported conversion type')
       }
@@ -166,28 +163,64 @@ export async function POST(request: NextRequest) {
 // Conversion functions (these would use actual conversion libraries in production)
 
 async function convertPdfToDocx(inputPath: string, outputPath: string, formData: FormData): Promise<boolean> {
-  // In a real implementation, this would use a library like pdf2docx or call an external API
-  // For now, we'll simulate the conversion
-  
-  const maintainFormatting = formData.get('maintainFormatting') === 'true'
-  const extractImages = formData.get('extractImages') === 'true'
-  const pageFrom = formData.get('pageFrom')
-  const pageTo = formData.get('pageTo')
-  
-  console.log('Converting PDF to DOCX with options:', {
-    maintainFormatting,
-    extractImages,
-    pageFrom,
-    pageTo
-  })
-  
-  // Simulate conversion delay
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  
-  // Create a dummy output file
-  await writeFile(outputPath, Buffer.from('Converted DOCX content'))
-  
-  return true
+  try {
+    const maintainFormatting = formData.get('maintainFormatting') === 'true'
+    const extractImages = formData.get('extractImages') === 'true'
+    const pageFrom = formData.get('pageFrom')
+    const pageTo = formData.get('pageTo')
+    
+    console.log('Converting PDF to DOCX with options:', {
+      maintainFormatting,
+      extractImages,
+      pageFrom,
+      pageTo
+    })
+    
+    // Get the path to the Python script
+    const pythonScriptPath = join(process.cwd(), 'pdf_to_docx.py')
+    
+    // Build command arguments
+    const args = []
+    if (!maintainFormatting) {
+      args.push('--no-maintain-formatting')
+    }
+    if (!extractImages) {
+      args.push('--no-extract-images')
+    }
+    if (pageFrom) {
+      args.push('--page-from', pageFrom.toString())
+    }
+    if (pageTo) {
+      args.push('--page-to', pageTo.toString())
+    }
+    
+    // Execute Python script
+    const command = `python "${pythonScriptPath}" "${inputPath}" "${outputPath}" ${args.join(' ')}`
+    
+    console.log('Executing command:', command)
+    
+    const { stdout, stderr } = await execAsync(command)
+    
+    if (stderr) {
+      console.error('Python script stderr:', stderr)
+    }
+    
+    if (stdout) {
+      console.log('Python script stdout:', stdout)
+    }
+    
+    // Check if output file was created
+    const fs = require('fs')
+    if (!fs.existsSync(outputPath)) {
+      console.error('Output file was not created')
+      return false
+    }
+    
+    return true
+  } catch (error) {
+    console.error('Error converting PDF to DOCX:', error)
+    return false
+  }
 }
 
 async function convertDocxToPdf(inputPath: string, outputPath: string): Promise<boolean> {
@@ -206,16 +239,6 @@ async function convertImageFormat(inputPath: string, outputPath: string, format:
   
   await new Promise(resolve => setTimeout(resolve, 1000))
   await writeFile(outputPath, Buffer.from('Converted image content'))
-  
-  return true
-}
-
-async function convertVideoToAudio(inputPath: string, outputPath: string): Promise<boolean> {
-  // In a real implementation, this would use ffmpeg
-  console.log('Converting video to audio')
-  
-  await new Promise(resolve => setTimeout(resolve, 3000))
-  await writeFile(outputPath, Buffer.from('Converted audio content'))
   
   return true
 }

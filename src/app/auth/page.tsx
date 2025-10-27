@@ -5,7 +5,6 @@ import type { Metadata } from 'next';
 import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiUser, FiEye, FiEyeOff } from 'react-icons/fi';
 
-import OAuthLogin from '@/components/auth/OAuthLogin';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -74,28 +73,6 @@ export default function AuthPage() {
               <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
             </div>
           )}
-
-          {/* OAuth Login Component */}
-          <OAuthLogin
-            onSuccess={(user) => {
-              setError('')
-              router.push('/')
-            }}
-            onError={(error) => setError(error)}
-            className="mb-6"
-          />
-
-          {/* Divider */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-600" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                Or continue with email
-              </span>
-            </div>
-          </div>
 
           {/* Login Form */}
           {authMode === 'login' && (

@@ -142,58 +142,6 @@ export const allTools: Tool[] = [
     url: '/detectors/plagiarism',
     category: 'detectors',
     tags: ['text', 'plagiarism', 'academic', 'writing']
-  },
-  
-  // Editors
-  {
-    id: 'text-editor',
-    name: 'Text Editor',
-    description: 'Simple online text editor',
-    url: '/editors/text',
-    category: 'editors',
-    tags: ['text', 'editor', 'writing']
-  },
-  {
-    id: 'image-editor',
-    name: 'Image Editor',
-    description: 'Edit images online',
-    url: '/editors/image',
-    category: 'editors',
-    tags: ['image', 'editor', 'creative']
-  },
-  {
-    id: 'code-editor',
-    name: 'Code Editor',
-    description: 'Online code editor with syntax highlighting',
-    url: '/editors/code',
-    category: 'editors',
-    tags: ['code', 'editor', 'developer', 'programming']
-  },
-  
-  // Enhancers
-  {
-    id: 'image-enhancer',
-    name: 'Image Enhancer',
-    description: 'Enhance image quality',
-    url: '/enhancers/image',
-    category: 'enhancers',
-    tags: ['image', 'quality', 'enhancement']
-  },
-  {
-    id: 'text-enhancer',
-    name: 'Text Enhancer',
-    description: 'Improve text quality and readability',
-    url: '/enhancers/text',
-    category: 'enhancers',
-    tags: ['text', 'writing', 'enhancement']
-  },
-  {
-    id: 'audio-enhancer',
-    name: 'Audio Enhancer',
-    description: 'Enhance audio quality',
-    url: '/enhancers/audio',
-    category: 'enhancers',
-    tags: ['audio', 'sound', 'enhancement']
   }
 ];
 

@@ -1,3 +1,7 @@
+# Python dependencies for PDF to DOCX conversion
+pdf2docx>=0.5.8
+python-docx>=0.8.11
+
 # This project uses Node.js and npm/yarn for package management
 # Please use the package.json file for dependencies
 # Below are the main dependencies for this project:
@@ -23,3 +27,6 @@
 # npm install
 # or
 # yarn install
+#
+# For Python dependencies:
+# pip install -r requirements.txt

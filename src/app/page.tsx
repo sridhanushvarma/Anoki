@@ -1,6 +1,6 @@
 "use client"
 
-import { FiActivity, FiUpload, FiShield, FiEdit, FiZap, FiClock, FiCommand } from 'react-icons/fi'
+import { FiActivity, FiUpload, FiShield, FiClock, FiCommand } from 'react-icons/fi'
 import ToolCard from '@/components/ToolCard'
 import { motion } from 'framer-motion'
 import RecommendedTools from '@/components/RecommendedTools'
@@ -77,28 +77,6 @@ export default function Home() {
             href="/detectors"
             bgColor="bg-red-100 dark:bg-red-900"
             iconColor="text-red-600 dark:text-red-400"
-          />
-        </motion.div>
-
-        <motion.div variants={item}>
-          <ToolCard
-            title="Image/Video Editors"
-            description="Edit images and videos with simple upload-edit-save functionality."
-            icon={<FiEdit className="h-8 w-8" />}
-            href="/editors"
-            bgColor="bg-purple-100 dark:bg-purple-900"
-            iconColor="text-purple-600 dark:text-purple-400"
-          />
-        </motion.div>
-
-        <motion.div variants={item}>
-          <ToolCard
-            title="Quality Enhancers"
-            description="Enhance the resolution and quality of your images and videos."
-            icon={<FiZap className="h-8 w-8" />}
-            href="/enhancers"
-            bgColor="bg-yellow-100 dark:bg-yellow-900"
-            iconColor="text-yellow-600 dark:text-yellow-400"
           />
         </motion.div>
 

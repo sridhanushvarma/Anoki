@@ -19,8 +19,6 @@ const publicRoutes = [
   '/ai-tools',
   '/converters',
   '/detectors',
-  '/editors',
-  '/enhancers',
   '/contact',
   '/privacy',
   '/terms',

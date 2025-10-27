@@ -72,12 +72,6 @@ const Navbar = () => {
             <Link href="/detectors" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               AI Detectors
             </Link>
-            <Link href="/editors" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              Editors
-            </Link>
-            <Link href="/enhancers" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              Enhancers
-            </Link>
           </nav>
 
           <div className="flex items-center space-x-2">
@@ -195,20 +189,6 @@ const Navbar = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 AI Detectors
-              </Link>
-              <Link
-                href="/editors"
-                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Editors
-              </Link>
-              <Link
-                href="/enhancers"
-                className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Enhancers
               </Link>
 
               {/* Mobile Authentication */}

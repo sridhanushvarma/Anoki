@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Anoki - Your Ultimate Tools Collection',
-  description: 'A one-stop-shop for accessing popular AI tools, file converters, detectors, editors, and enhancers.',
+  description: 'A one-stop-shop for accessing popular AI tools, file converters, and detectors.',
   icons: {
     icon: `${BASE_PATH}/images/anoki-logo-light.jpg`,
     apple: `${BASE_PATH}/images/anoki-logo-light.jpg`,

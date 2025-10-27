@@ -6,7 +6,7 @@ import { FiUpload, FiFile, FiX } from 'react-icons/fi'
 import { useDropzone } from 'react-dropzone'
 import DownloadProtection from '@/components/DownloadProtection'
 
-type ConversionType = 'pdf-to-docx' | 'docx-to-pdf' | 'jpg-to-png' | 'png-to-jpg' | 'mp4-to-mp3' | 'more'
+type ConversionType = 'pdf-to-docx' | 'docx-to-pdf' | 'jpg-to-png' | 'png-to-jpg' | 'more'
 
 export default function ConvertersPage() {
   const [selectedConversion, setSelectedConversion] = useState<ConversionType>('pdf-to-docx')
@@ -201,18 +201,6 @@ export default function ConvertersPage() {
                   >
                     <span className="block font-medium mb-1">PNG to JPG</span>
                     <span className="text-sm text-gray-600 dark:text-gray-400">Convert PNG to JPG</span>
-                  </button>
-                  
-                  <button 
-                    className={`conversion-type-btn rounded-lg p-4 text-center transition-colors ${
-                      selectedConversion === 'mp4-to-mp3' 
-                        ? 'bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-800' 
-                        : 'bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900'
-                    }`}
-                    onClick={() => handleConversionTypeChange('mp4-to-mp3')}
-                  >
-                    <span className="block font-medium mb-1">MP4 to MP3</span>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Extract audio from video</span>
                   </button>
                   
                   <button 
