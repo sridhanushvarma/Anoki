@@ -30,6 +30,8 @@ const customJestConfig = {
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
+  maxWorkers: 1,
+  runInBand: true,
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

@@ -4,7 +4,7 @@ import { setupTestDb, teardownTestDb, createTestUser } from '../../helpers/testD
 
 // Mock the auth utilities
 jest.mock('@/lib/auth', () => ({
-  verifyPassword: jest.fn(),
+  verifyPassword: jest.fn().mockResolvedValue(false),
   generateAccessToken: jest.fn().mockReturnValue('access-token'),
   generateRefreshToken: jest.fn().mockReturnValue('refresh-token'),
   checkRateLimit: jest.fn().mockResolvedValue(true),
@@ -12,12 +12,25 @@ jest.mock('@/lib/auth', () => ({
   createSession: jest.fn().mockResolvedValue({
     accessToken: 'access-token',
     refreshToken: 'refresh-token'
-  })
+  }),
+  checkAccountLockout: jest.fn().mockResolvedValue(true),
+  handleFailedLogin: jest.fn().mockResolvedValue(undefined),
 }))
 
 describe('/api/auth/login', () => {
   beforeEach(async () => {
     await setupTestDb()
+    // Reset all mocks before each test
+    jest.clearAllMocks()
+    // Set default mock values
+    const { verifyPassword, checkRateLimit, logAuditEvent, createSession } = require('@/lib/auth')
+    verifyPassword.mockResolvedValue(false)
+    checkRateLimit.mockResolvedValue(true)
+    logAuditEvent.mockResolvedValue(undefined)
+    createSession.mockResolvedValue({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token'
+    })
   })
 
   afterAll(async () => {
