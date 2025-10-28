@@ -195,11 +195,11 @@ async function convertPdfToDocx(inputPath: string, outputPath: string, formData:
     }
     
     // Execute Python script
-    const command = `python "${pythonScriptPath}" "${inputPath}" "${outputPath}" ${args.join(' ')}`
-    
+    const command = `python3 "${pythonScriptPath}" "${inputPath}" "${outputPath}" ${args.join(' ')}`
+
     console.log('Executing command:', command)
-    
-    const { stdout, stderr } = await execAsync(command)
+
+    const { stdout, stderr } = await execAsync(command, { maxBuffer: 10 * 1024 * 1024 })
     
     if (stderr) {
       console.error('Python script stderr:', stderr)

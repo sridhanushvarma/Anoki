@@ -1,14 +1,71 @@
 "use client"
 
-import { FiActivity, FiUpload, FiShield, FiClock, FiCommand } from 'react-icons/fi'
+import { useState, useEffect } from 'react'
+import { FiEdit, FiZap, FiCommand, FiMessageCircle } from 'react-icons/fi'
 import ToolCard from '@/components/ToolCard'
 import { motion } from 'framer-motion'
 import RecommendedTools from '@/components/RecommendedTools'
 import useToolTracking from '@/hooks/useToolTracking'
 
+interface Tool {
+  title: string
+  description: string
+  icon: JSX.Element
+  href: string
+  bgColor: string
+  iconColor: string
+}
+
 export default function Home() {
   // Track homepage visit
   useToolTracking('homepage');
+
+  const [displayedTools, setDisplayedTools] = useState<Tool[]>([])
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  // All available tools
+  const allTools: Tool[] = [
+    {
+      title: "Image Editor",
+      description: "Edit and enhance your images with powerful tools like crop, rotate, resize, and more.",
+      icon: <FiEdit className="h-8 w-8" />,
+      href: "/editor",
+      bgColor: "bg-purple-100 dark:bg-purple-900",
+      iconColor: "text-purple-600 dark:text-purple-400"
+    },
+    {
+      title: "Image Enhancer",
+      description: "Enhance image quality with AI-powered upscaling, denoising, and sharpening.",
+      icon: <FiZap className="h-8 w-8" />,
+      href: "/enhancer",
+      bgColor: "bg-yellow-100 dark:bg-yellow-900",
+      iconColor: "text-yellow-600 dark:text-yellow-400"
+    },
+    {
+      title: "Send Feedback",
+      description: "Share your feedback, report bugs, or suggest new features to help us improve.",
+      icon: <FiMessageCircle className="h-8 w-8" />,
+      href: "/feedback",
+      bgColor: "bg-green-100 dark:bg-green-900",
+      iconColor: "text-green-600 dark:text-green-400"
+    }
+  ]
+
+  // Shuffle and select random tools on mount
+  useEffect(() => {
+    const shuffleTools = () => {
+      const shuffled = [...allTools].sort(() => Math.random() - 0.5)
+      setDisplayedTools(shuffled)
+    }
+
+    shuffleTools()
+    setIsInitialized(true)
+
+    // Cycle through tools every 30 seconds
+    const interval = setInterval(shuffleTools, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -40,58 +97,29 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Tools Categories */}
-      <motion.section
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
-        variants={container}
-        initial="hidden"
-        animate="show"
-      >
-        <motion.div variants={item}>
-          <ToolCard
-            title="AI Tools"
-            description="Access popular AI agents like ChatGPT, Gemini, Claude, and more."
-            icon={<FiActivity className="h-8 w-8" />}
-            href="/ai-tools"
-            bgColor="bg-blue-100 dark:bg-blue-900"
-            iconColor="text-blue-600 dark:text-blue-400"
-          />
-        </motion.div>
-
-        <motion.div variants={item}>
-          <ToolCard
-            title="File Converters"
-            description="Convert between different file formats like PDF, DOCX, JPG, PNG, and more."
-            icon={<FiUpload className="h-8 w-8" />}
-            href="/converters"
-            bgColor="bg-green-100 dark:bg-green-900"
-            iconColor="text-green-600 dark:text-green-400"
-          />
-        </motion.div>
-
-        <motion.div variants={item}>
-          <ToolCard
-            title="AI/Plagiarism Detectors"
-            description="Detect AI-generated content and check for plagiarism with popular tools."
-            icon={<FiShield className="h-8 w-8" />}
-            href="/detectors"
-            bgColor="bg-red-100 dark:bg-red-900"
-            iconColor="text-red-600 dark:text-red-400"
-          />
-        </motion.div>
-
-        <motion.div variants={item}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex flex-col items-center h-full">
-            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-              <FiClock className="h-8 w-8 text-gray-600 dark:text-gray-400" />
-            </div>
-            <h2 className="text-xl font-semibold mb-2">Coming Soon</h2>
-            <p className="text-gray-600 dark:text-gray-400 text-center">
-              More tools and features are on the way. Stay tuned!
-            </p>
-          </div>
-        </motion.div>
-      </motion.section>
+      {/* Tools Categories - Randomly Cycled */}
+      {isInitialized && (
+        <motion.section
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
+          variants={container}
+          initial="hidden"
+          animate="show"
+          key={displayedTools.map(t => t.title).join('-')}
+        >
+          {displayedTools.map((tool) => (
+            <motion.div key={tool.title} variants={item}>
+              <ToolCard
+                title={tool.title}
+                description={tool.description}
+                icon={tool.icon}
+                href={tool.href}
+                bgColor={tool.bgColor}
+                iconColor={tool.iconColor}
+              />
+            </motion.div>
+          ))}
+        </motion.section>
+      )}
 
       {/* Recommended Tools Section */}
       <RecommendedTools title="Recommended for You" limit={4} />
@@ -127,41 +155,32 @@ export default function Home() {
       {/* Features Section */}
       <section className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-16">
         <h2 className="text-2xl font-bold mb-6 text-center">Why Choose Anoki?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4">
               <FiZap className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">All-in-One Solution</h3>
+            <h3 className="text-lg font-semibold mb-2">Fast & Efficient</h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Access all your favorite tools in one place without switching between websites.
+              Quick processing with powerful tools for image editing and enhancement.
             </p>
           </div>
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-4">
-              <FiShield className="h-6 w-6 text-green-600 dark:text-green-400" />
+              <FiEdit className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Privacy Focused</h3>
+            <h3 className="text-lg font-semibold mb-2">Easy to Use</h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Local processing for many tools means your data stays on your device.
+              Intuitive interface designed for both beginners and professionals.
             </p>
           </div>
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mb-4">
-              <FiEdit className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <FiMessageCircle className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Smart Suggestions</h3>
+            <h3 className="text-lg font-semibold mb-2">Your Feedback Matters</h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Get personalized tool recommendations based on your usage patterns.
-            </p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mb-4">
-              <FiCommand className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Command Launcher</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Chain multiple tools together with simple natural language commands.
+              Help us improve by sharing your feedback and suggestions.
             </p>
           </div>
         </div>
