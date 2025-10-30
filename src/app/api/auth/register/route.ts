@@ -139,8 +139,19 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Registration error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Error details:', errorMessage)
+
+    // Check for database connection errors
+    if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('connect')) {
+      return addSecurityHeaders(NextResponse.json(
+        { error: 'Database connection error. Please try again later.' },
+        { status: 503 }
+      ))
+    }
+
     return addSecurityHeaders(NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: process.env.NODE_ENV === 'development' ? errorMessage : undefined },
       { status: 500 }
     ))
   }
