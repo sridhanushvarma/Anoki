@@ -8,6 +8,10 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import CommandButton from '@/components/CommandButton'
 import { BASE_PATH } from './constants'
 
+// Disable static generation for the entire app since we use dynamic features
+export const dynamic = 'auto'
+export const revalidate = 0
+
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {

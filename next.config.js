@@ -5,6 +5,12 @@ const nextConfig = {
   // Vercel deployment configuration (no static export for server-side features)
   // Remove static export for Vercel as we need API routes and server-side features
 
+  // Disable static optimization for pages that use dynamic features
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000,
+    pagesBufferLength: 5,
+  },
+
   images: {
     remotePatterns: [
       {

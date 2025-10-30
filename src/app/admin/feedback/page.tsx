@@ -1,5 +1,9 @@
 'use client'
 
+// Route segment configuration
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import { useState, useEffect } from 'react'
 import { FiTrash2, FiRefreshCw, FiLock } from 'react-icons/fi'
 import { motion } from 'framer-motion'

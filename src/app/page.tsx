@@ -1,5 +1,9 @@
 "use client"
 
+// Route segment configuration
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import { useState, useEffect } from 'react'
 import { FiEdit, FiZap, FiCommand, FiMessageCircle } from 'react-icons/fi'
 import ToolCard from '@/components/ToolCard'
