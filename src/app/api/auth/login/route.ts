@@ -4,6 +4,10 @@ import { prisma } from '@/lib/prisma'
 import { verifyPassword, createSession, checkRateLimit, logAuditEvent, checkAccountLockout, handleFailedLogin } from '@/lib/auth'
 import { addSecurityHeaders } from '@/lib/securityHeaders'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),

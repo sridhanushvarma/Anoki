@@ -5,6 +5,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const execAsync = promisify(exec)
 
 // Maximum file size (50MB)

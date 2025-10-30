@@ -6,6 +6,10 @@ import { sendVerificationEmail } from '@/lib/email'
 import { addSecurityHeaders } from '@/lib/securityHeaders'
 import crypto from 'crypto'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const registerSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   email: z.string().email('Invalid email address'),

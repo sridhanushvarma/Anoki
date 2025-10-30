@@ -4,6 +4,10 @@ import { verifyAccessToken, logAuditEvent } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { verifyTwoFactorToken, validateBackupCode, removeUsedBackupCode } from '@/lib/twoFactor'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const verifyTwoFactorSchema = z.object({
   token: z.string().min(6, '2FA token must be at least 6 characters'),
   isBackupCode: z.boolean().optional().default(false),

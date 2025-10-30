@@ -3,6 +3,10 @@ import { writeFile, unlink } from 'fs/promises'
 import { join } from 'path'
 import { v4 as uuidv4 } from 'uuid'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 // Maximum file size (50MB)
 const MAX_FILE_SIZE = 50 * 1024 * 1024
 

@@ -3,6 +3,10 @@ import { verifyAccessToken, logAuditEvent } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { generateTwoFactorSecret, generateQRCode } from '@/lib/twoFactor'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function POST(request: NextRequest) {
   try {
     const accessToken = request.cookies.get('accessToken')?.value

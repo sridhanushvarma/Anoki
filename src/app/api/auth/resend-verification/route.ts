@@ -5,6 +5,10 @@ import { checkRateLimit, logAuditEvent } from '@/lib/auth'
 import { sendVerificationEmail } from '@/lib/email'
 import crypto from 'crypto'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const resendVerificationSchema = z.object({
   email: z.string().email('Invalid email address'),
 })

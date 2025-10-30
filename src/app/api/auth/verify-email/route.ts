@@ -4,6 +4,10 @@ import { prisma } from '@/lib/prisma'
 import { logAuditEvent } from '@/lib/auth'
 import { sendWelcomeEmail } from '@/lib/email'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const verifyEmailSchema = z.object({
   token: z.string().min(1, 'Verification token is required'),
 })

@@ -3,6 +3,10 @@ import { z } from 'zod'
 import { verifyAccessToken, logAuditEvent } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const updateProfileSchema = z.object({
   firstName: z.string().max(50).optional(),
   lastName: z.string().max(50).optional(),

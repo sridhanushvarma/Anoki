@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 // Admin password - in production, use proper authentication
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'
 
